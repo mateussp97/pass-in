@@ -1,33 +1,58 @@
-import { PrismaClient } from "@prisma/client";
+import fastifyCors from "@fastify/cors";
+import fastifySwagger from "@fastify/swagger";
+import fastifySwaggerUI from "@fastify/swagger-ui";
 import fastify from "fastify";
-import z from "zod";
+import {
+  jsonSchemaTransform,
+  serializerCompiler,
+  validatorCompiler,
+} from "fastify-type-provider-zod";
+import { errorHandler } from "./error-handler";
+import { checkIn } from "./routes/check-in";
+import { createEvent } from "./routes/create-event";
+import { getAttendeeBadge } from "./routes/get-attendee-badge";
+import { getEvent } from "./routes/get-event";
+import { getEventAttendees } from "./routes/get-event-attendees";
+import { getEvents } from "./routes/get-events";
+import { registerForEvent } from "./routes/register-for-event";
 
 const app = fastify();
 
-const prisma = new PrismaClient({
-  log: ["query"], // Com isso, cada query que for feita ao banco de dados, prisma fará um log
+app.register(fastifyCors, {
+  origin: "*",
 });
 
-app.post("/events", async (request, reply) => {
-  // Criando o schema do evento com ZOD
-  const createEventSchema = z.object({
-    title: z.string().min(4),
-    details: z.string().nullable(),
-    maximumAttendees: z.number().int().positive().nullable(),
-  });
-
-  const data = createEventSchema.parse(request.body); // Validando os dados do body com o schema criado
-
-  const event = await prisma.event.create({
-    data: {
-      title: data.title,
-      details: data.details,
-      maximumAttendees: data.maximumAttendees,
-      slug: new Date().toISOString(),
+app.register(fastifySwagger, {
+  swagger: {
+    consumes: ["application/json"],
+    produces: ["application/json"],
+    info: {
+      title: "pass.in",
+      description:
+        "Especificações da API para o back-end da aplicação pass.in construída durante o NLW Unite da Rocketseat.",
+      version: "1.0.0",
     },
-  });
-
-  return reply.status(201).send({ eventId: event.id });
+  },
+  transform: jsonSchemaTransform,
 });
 
-app.listen({ port: 3333 }).then(() => console.log("HTTP server running!"));
+app.register(fastifySwaggerUI, {
+  routePrefix: "/docs",
+});
+
+app.setValidatorCompiler(validatorCompiler);
+app.setSerializerCompiler(serializerCompiler);
+
+app.register(createEvent);
+app.register(registerForEvent);
+app.register(getEvent);
+app.register(getEvents);
+app.register(getEventAttendees);
+app.register(getAttendeeBadge);
+app.register(checkIn);
+
+app.setErrorHandler(errorHandler);
+
+app
+  .listen({ port: 3333, host: "0.0.0.0" })
+  .then(() => console.log("HTTP server running!"));

@@ -29,9 +29,13 @@ O sistema fará um scan da credencial do participante para permitir a entrada no
 
 - [x] O check-in no evento será realizado através de um QRCode;
 
+### Novas Funcionalidades implementadas
+
+- [x] Nova rota implementada que lista todos os eventos;
+
 ## Documentação da API (Swagger)
 
-Para documentação da API, acesse o link: https://nlw-unite-nodejs.onrender.com/docs
+Para documentação da API, acesse o link: http://localhost:3333/docs
 
 ## Banco de dados
 

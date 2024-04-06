@@ -2,7 +2,37 @@ POST http://localhost:3333/events
 Content-Type: application/json
 
 {
-  "title": "Unite Summit",
-  "details": "Um evento para quem é apaixonado por programação",
+  "title": "Tech Talks",
+  "details": "A meeting to exchange knowledge on the latest technologies and trends!",
   "maximumAttendees": 100
 }
+
+###
+
+POST http://localhost:3333/events/692b89fd-51df-4f90-81f9-4760882dced8/attendees
+Content-Type: application/json
+
+{
+  "name": "Mateus de Souza Paula",
+  "email": "mateusdesouzapaula97@gmail.com"
+}
+
+###
+
+GET http://localhost:3333/events/692b89fd-51df-4f90-81f9-4760882dced8
+
+###
+
+GET http://localhost:3333/attendees/12551/badge
+
+###
+
+GET http://localhost:3333/attendees/12551/check-in
+
+###
+
+GET http://localhost:3333/events
+
+###
+
+GET http://localhost:3333/events/692b89fd-51df-4f90-81f9-4760882dced8/attendees
