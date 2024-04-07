@@ -10,6 +10,9 @@ import {
   Search,
 } from "lucide-react";
 import { ChangeEvent, useEffect, useState } from "react";
+import { AttendeeSchema } from "../../types/types";
+import { Attendee } from "../api/Attendees";
+import { useQueryFilters } from "../hooks/useQueryFilters";
 import { IconButton } from "./icon-button";
 import { Table } from "./table/table";
 import { TableCell } from "./table/table-cell";
@@ -19,94 +22,64 @@ import { TableRow } from "./table/table-row";
 dayjs.extend(relativeTime);
 dayjs.locale("pt-br");
 
-interface Attendee {
-  id: string;
-  name: string;
-  email: string;
-  createdAt: string;
-  checkedInAt: string | null;
-}
-
 export function AttendeeList() {
-  const [search, setSearch] = useState(() => {
-    const url = new URL(window.location.toString());
-
-    if (url.searchParams.has("search")) {
-      return url.searchParams.get("search") ?? "";
-    }
-
-    return "";
-  });
-  const [page, setPage] = useState(() => {
-    const url = new URL(window.location.toString());
-
-    if (url.searchParams.has("page")) {
-      return Number(url.searchParams.get("page"));
-    }
-
-    return 1;
-  });
+  const { getFilter, setFilter } = useQueryFilters();
+  const [search, setSearch] = useState(getFilter("search") || "");
+  const [page, setPage] = useState(Number(getFilter("page") || 1));
 
   const [total, setTotal] = useState(0);
-  const [attendees, setAttendees] = useState<Attendee[]>([]);
-
+  const [attendees, setAttendees] = useState<AttendeeSchema[]>([]);
   const totalPages = Math.ceil(total / 10);
 
+  const eventId = getFilter("eventId");
+
+  // Updates participants based on changes in filters
   useEffect(() => {
-    const url = new URL(
-      "http://localhost:3333/events/9e9bd979-9d10-4915-b339-3786b1634f33/attendees"
-    );
+    (async () => {
+      if (eventId !== null) {
+        const { attendees, total } = await Attendee.get({
+          eventId,
+          pageIndex: page - 1,
+          query: search,
+        });
 
-    url.searchParams.set("pageIndex", String(page - 1));
-    if (search.length > 1) {
-      url.searchParams.set("query", search);
-    }
+        setAttendees(attendees);
+        setTotal(total);
+      }
+    })();
+  }, [page, search, eventId]);
 
-    fetch(url)
-      .then((response) => response.json())
-      .then((data) => {
-        setAttendees(data.attendees);
-        setTotal(data.total);
-      });
-  }, [page, search]);
+  // Restart paging when changing the event
+  useEffect(() => {
+    setPage(1);
+    setFilter("page", "1");
+  }, [eventId]);
 
-  function setCurrentSearch(search: string) {
-    const url = new URL(window.location.toString());
-
-    url.searchParams.set("search", search);
-
-    window.history.pushState({}, "", url);
-
-    setSearch(search);
+  function setCurrentSearch(newSearch: string) {
+    setFilter("search", newSearch);
+    setSearch(newSearch);
   }
 
-  function setCurrentPage(page: number) {
-    const url = new URL(window.location.toString());
-
-    url.searchParams.set("page", String(page));
-
-    window.history.pushState({}, "", url);
-
-    setPage(page);
+  function setCurrentPage(newPage: number) {
+    setFilter("page", String(newPage));
+    setPage(newPage);
   }
 
   function onSearchInputChanged(event: ChangeEvent<HTMLInputElement>) {
-    setCurrentSearch(event.target.value);
-    setCurrentPage(1);
+    const newSearch = event.target.value;
+    setCurrentSearch(newSearch);
+    setCurrentPage(1); // Restarts paging when searching again
   }
 
   function goToFirstPage() {
     setCurrentPage(1);
   }
-
   function goToLastPage() {
     setCurrentPage(totalPages);
   }
-
   function goToPreviousPage() {
     setCurrentPage(page - 1);
   }
-
   function goToNextPage() {
     setCurrentPage(page + 1);
   }
