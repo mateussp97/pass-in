@@ -1,3 +1,5 @@
+import { faker } from "@faker-js/faker";
+import { Prisma } from "@prisma/client";
 import { FastifyInstance } from "fastify";
 import { ZodTypeProvider } from "fastify-type-provider-zod";
 import z from "zod";
@@ -67,15 +69,24 @@ export async function registerForEvent(app: FastifyInstance) {
         );
       }
 
-      const attendee = await prisma.attendee.create({
-        data: {
-          name,
-          email,
-          eventId,
-        },
-      });
-
-      return reply.status(201).send({ attendeeId: attendee.id });
+      try {
+        const attendee = await prisma.attendee.create({
+          data: {
+            id: faker.number.int({ min: 10000, max: 99999 }),
+            name,
+            email,
+            eventId,
+          },
+        });
+        return reply.status(201).send({ attendeeId: attendee.id });
+      } catch (error) {
+        console.error("Erro ao criar attendee:", error);
+        // Log detalhado do erro
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+          console.log("Código de erro do Prisma:", error.code);
+          console.log("Meta informações do erro:", error.meta);
+        }
+      }
     }
   );
 }
