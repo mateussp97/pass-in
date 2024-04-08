@@ -9,6 +9,11 @@ const get = async (): Promise<{ events: EventSchema[] }> => {
     },
   });
 
+  if (!response.ok) {
+    const errorBody = await response.json();
+    throw new Error(errorBody.message);
+  }
+
   return response.json();
 };
 

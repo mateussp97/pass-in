@@ -14,3 +14,10 @@ export interface AttendeeSchema {
   email: string;
   name: string;
 }
+
+export interface BadgeAttendeeSchema {
+  checkInURL: string;
+  email: string;
+  eventTitle: string;
+  name: string;
+}
