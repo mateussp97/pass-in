@@ -58,7 +58,7 @@ export default function GetTicket() {
             <StyledInput
               icon={<Ticket className="size-4 text-emerald-300" />}
               name="attendeeId"
-              placeholder="Código do ingresso"
+              placeholder="Ticket code"
             />
           </div>
 
@@ -67,7 +67,7 @@ export default function GetTicket() {
             disabled={isLoading}
             className="w-full h-fit py-3.5 bg-tangerine-400 text-firefly-950 font-bold text-sm uppercase rounded-xl"
           >
-            Acessar Credencial
+            Access Credential
           </button>
           <Link
             to="/register"
@@ -76,7 +76,7 @@ export default function GetTicket() {
             )}
           >
             <button className="w-full h-fit mt-3.5 py-3.5 bg-transparent text-gray-200 font-bold text-base rounded-xl">
-              Ainda não possui ingresso?
+              Don't have a ticket yet?
             </button>
           </Link>
         </form>

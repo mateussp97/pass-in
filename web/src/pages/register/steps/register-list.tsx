@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { twMerge } from "tailwind-merge";
+import { EventSchema } from "../../../../types/types";
 import { Attendee } from "../../../api/Attendees";
 import { Events } from "../../../api/Events";
 import { EventsAtom } from "../../../atoms/EventsAtom";
@@ -24,14 +25,21 @@ export default function RegisterList({ email, name }: RegisterListProps) {
     })();
   }, []);
 
-  async function onSelectEvent(eventId: string) {
+  async function onSelectEvent(event: EventSchema) {
+    const { id, title } = event;
+
     try {
       setIsLoading(true);
 
       const { attendeeId } = await Attendee.registerForEvent({
         name,
         email,
-        eventId,
+        eventId: id,
+      });
+
+      toast(`You have been registered as a attendee of the ${title} event`, {
+        theme: "dark",
+        type: "success",
       });
 
       navigate(`/ticket?attendeeId=${attendeeId}`);
@@ -50,7 +58,7 @@ export default function RegisterList({ email, name }: RegisterListProps) {
       {events.map((event) => (
         <div
           key={event.id}
-          onClick={async () => await onSelectEvent(event.id)}
+          onClick={async () => await onSelectEvent(event)}
           className={twMerge(
             "w-full p-4 flex flex-col items-start rounded-2xl border border-white border-opacity-10 cursor-pointer",
             isLoading || event.attendeesAmout === event.maximumAttendees

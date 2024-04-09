@@ -44,7 +44,7 @@ export default function RegisterForm({ setRegister }: RegisterListProps) {
         <StyledInput
           icon={<Users className="size-4 text-emerald-300" />}
           name="name"
-          placeholder="Nome completo"
+          placeholder="Full name"
         />
 
         <div className="w-full h-fit my-3">
@@ -59,11 +59,11 @@ export default function RegisterForm({ setRegister }: RegisterListProps) {
           type="submit"
           className="w-full h-fit py-3.5 bg-tangerine-400 text-firefly-950 font-bold text-sm uppercase rounded-xl"
         >
-          Realizar Inscrição
+          Register
         </button>
         <Link to="/get-ticket">
           <button className="w-full h-fit mt-3.5 py-3.5 bg-transparent text-gray-200 font-bold text-base rounded-xl">
-            Já possui ingresso?
+            Already have a ticket?
           </button>
         </Link>
       </form>
