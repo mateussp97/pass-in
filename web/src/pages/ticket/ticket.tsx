@@ -75,7 +75,7 @@ export default function Ticket() {
           <p className="text-base mt-1 mb-6 text-gray-300">
             Show the world you're going to the {badge.eventTitle}!
           </p>
-          <button className="w-full h-fit py-3.5 bg-tangerine-400 text-firefly-950 font-bold text-sm uppercase rounded-xl">
+          <button className="w-full h-fit py-3.5 bg-tangerine-400 hover:bg-tangerine-300 text-firefly-950 font-bold text-sm uppercase rounded-xl">
             Share
           </button>
           <Link to="/get-ticket">

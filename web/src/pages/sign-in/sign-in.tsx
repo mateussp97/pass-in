@@ -1,10 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AtSign, Blocks } from "lucide-react";
 import { FormProvider, useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
 import StyledInput from "../../components/forms/styled-input";
 import MobileFormLayout from "../../components/layouts/mobile-form-layout";
+import { User } from "../../api/User";
+import { toast } from "react-toastify";
 
 const onRegisterFormSchema = z.object({
   email: z
@@ -23,15 +25,31 @@ export default function SignIn() {
   const { handleSubmit, ...rest } = useForm<IRegisterForm>({
     resolver: zodResolver(onRegisterFormSchema),
   });
+  const navigate = useNavigate();
 
-  function onRegister(data: IRegisterForm) {
-    console.log(data);
+  async function onRegister(data: IRegisterForm) {
+    try {
+      const response = await User.login(data);
+
+      localStorage.setItem("@pass-in/token", response.token);
+
+      navigate("/dashboard");
+    } catch (e: unknown) {
+      toast((e as Error).message, {
+        theme: "dark",
+        type: "error",
+      });
+    }
   }
 
   return (
     <MobileFormLayout>
       <FormProvider handleSubmit={handleSubmit} {...rest}>
         <form onSubmit={handleSubmit(onRegister)} className="w-full px-8">
+          <p className="text-gray-200 text-center text-xl mb-8">
+            Enter your information to access <br /> our admin panel.
+          </p>
+
           <StyledInput
             icon={<AtSign className="size-4 text-emerald-300" />}
             name="email"
@@ -49,7 +67,7 @@ export default function SignIn() {
 
           <button
             type="submit"
-            className="w-full h-fit py-3.5 bg-tangerine-400 text-firefly-950 font-bold text-sm uppercase rounded-xl"
+            className="w-full h-fit py-3.5 bg-tangerine-400 hover:bg-tangerine-300 text-firefly-950 font-bold text-sm uppercase rounded-xl"
           >
             Sign in
           </button>

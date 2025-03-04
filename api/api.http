@@ -36,3 +36,15 @@ GET http://localhost:3333/events
 ###
 
 GET http://localhost:3333/events/692b89fd-51df-4f90-81f9-4760882dced8/attendees
+
+### 
+
+POST http://localhost:3333/users
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "email": "admin@admin.com",
+  "password": "12345678",
+  "role": "ADMIN"
+}

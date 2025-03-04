@@ -41,6 +41,10 @@ export default function RegisterForm({ setRegister }: RegisterListProps) {
   return (
     <FormProvider handleSubmit={handleSubmit} {...rest}>
       <form onSubmit={handleSubmit(onRegister)} className="w-full px-8">
+        <p className="text-gray-200 text-center text-xl mb-8">
+          Enter your information to start the sign-up step.
+        </p>
+
         <StyledInput
           icon={<Users className="size-4 text-emerald-300" />}
           name="name"
@@ -57,7 +61,7 @@ export default function RegisterForm({ setRegister }: RegisterListProps) {
 
         <button
           type="submit"
-          className="w-full h-fit py-3.5 bg-tangerine-400 text-firefly-950 font-bold text-sm uppercase rounded-xl"
+          className="w-full h-fit py-3.5 bg-tangerine-400 hover:bg-tangerine-300 text-firefly-950 font-bold text-sm uppercase rounded-xl"
         >
           Register
         </button>

@@ -9,8 +9,9 @@ export async function createEvent(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().post(
     "/events",
     {
+      onRequest: [app.authorizeAdmin],
       schema: {
-        summary: "Create an event",
+        summary: "Create an event (admin only)",
         tags: ["events"],
         body: z.object({
           title: z.string().min(4),

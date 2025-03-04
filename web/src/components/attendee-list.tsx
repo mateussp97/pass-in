@@ -6,8 +6,8 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
-  MoreHorizontal,
   Search,
+  Trash2,
 } from "lucide-react";
 import { ChangeEvent, useEffect, useState } from "react";
 import { AttendeeSchema } from "../../types/types";
@@ -18,9 +18,11 @@ import { Table } from "./table/table";
 import { TableCell } from "./table/table-cell";
 import { TableHeader } from "./table/table-header";
 import { TableRow } from "./table/table-row";
+import { useModalStore } from "../atoms/stores/useModalStore";
+import DeleteAttendeeModal from "./modal/delete-attendee-modal";
 
 dayjs.extend(relativeTime);
-dayjs.locale("pt-br");
+dayjs.locale("en-us");
 
 export function AttendeeList() {
   const { getFilter, setFilter } = useQueryFilters();
@@ -30,6 +32,10 @@ export function AttendeeList() {
   const [total, setTotal] = useState(0);
   const [attendees, setAttendees] = useState<AttendeeSchema[]>([]);
   const totalPages = Math.ceil(total / 10);
+
+  const {
+    methods: { onOpenModal, onCloseModal },
+  } = useModalStore();
 
   const eventId = getFilter("eventId");
 
@@ -87,14 +93,14 @@ export function AttendeeList() {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex gap-3 items-center">
-        <h1 className="text-2xl font-bold">Participantes</h1>
+        <h1 className="text-2xl font-bold">Attendees</h1>
 
         <div className="max-w-xs w-full flex flex-col items-start gap-1">
           <div className="px-3 w-full border rounded-lg flex items-center gap-3 border-white/10">
             <Search className="size-4 text-emerald-300" />
             <input
               className="bg-transparent py-2.5 focus:ring-0 flex-1 outline-none border-0 p-0 text-sm placeholder:text-gray-300"
-              placeholder="Buscar participante..."
+              placeholder="Find a attendee..."
               value={search}
               onChange={onSearchInputChanged}
             />
@@ -105,16 +111,10 @@ export function AttendeeList() {
       <Table>
         <thead>
           <tr className="border-b border-white/10">
-            <TableHeader style={{ width: 48 }}>
-              <input
-                type="checkbox"
-                className="size-4 bg-black/20 rounded border border-white/10"
-              />
-            </TableHeader>
-            <TableHeader>Código</TableHeader>
-            <TableHeader>Participante</TableHeader>
-            <TableHeader>Data de inscrição</TableHeader>
-            <TableHeader>Data do check-in</TableHeader>
+            <TableHeader>Code</TableHeader>
+            <TableHeader>Attendee</TableHeader>
+            <TableHeader>Registration date</TableHeader>
+            <TableHeader>Check-in date</TableHeader>
             <TableHeader style={{ width: 64 }}></TableHeader>
           </tr>
         </thead>
@@ -122,12 +122,6 @@ export function AttendeeList() {
           {attendees.map((ateendee) => {
             return (
               <TableRow key={ateendee.id}>
-                <TableCell>
-                  <input
-                    type="checkbox"
-                    className="size-4 bg-black/20 rounded border border-white/10"
-                  />
-                </TableCell>
                 <TableCell>{ateendee.id}</TableCell>
                 <TableCell>
                   <div className="flex flex-col gap-1">
@@ -140,17 +134,27 @@ export function AttendeeList() {
                 <TableCell>{dayjs().to(ateendee.createdAt)}</TableCell>
                 <TableCell>
                   {ateendee.checkedInAt === null ? (
-                    <span className="text-zinc-400">Não fez check-in</span>
+                    <span className="text-zinc-400">Not checked in</span>
                   ) : (
                     dayjs().to(ateendee.checkedInAt)
                   )}
                 </TableCell>
                 <TableCell>
                   <IconButton
+                    onClick={() =>
+                      onOpenModal({
+                        content: (
+                          <DeleteAttendeeModal
+                            onClose={onCloseModal}
+                            attendee={ateendee}
+                          />
+                        ),
+                      })
+                    }
                     transparent
                     className="bg-black/20 border border-white/10 rounded-md p-1.5"
                   >
-                    <MoreHorizontal className="size-4" />
+                    <Trash2 className="size-4 text-white/50" />
                   </IconButton>
                 </TableCell>
               </TableRow>
@@ -160,12 +164,13 @@ export function AttendeeList() {
         <tfoot>
           <tr>
             <TableCell colSpan={3}>
-              Mostrando {attendees.length} de {total} itens
+              Showing {attendees.length} of {total}{" "}
+              {total > 1 ? "attendees" : "attendee"}
             </TableCell>
             <TableCell className="text-right" colSpan={3}>
               <div className="inline-flex items-center gap-8">
                 <span>
-                  Página {page} de {totalPages}
+                  Page {page} of {totalPages}
                 </span>
 
                 <div className="flex gap-1.5">

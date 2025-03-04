@@ -67,13 +67,29 @@ async function seed() {
   }
 
   // Insert participants
-  await Promise.all(
-    attendeesToInsert.map((attendee) => {
+  await Promise.all([
+    ...attendeesToInsert.map((attendee) => {
       return prisma.attendee.create({
         data: attendee,
       });
-    })
-  );
+    }),
+    prisma.user.create({
+      data: {
+        role: "ADMIN",
+        name: "John Doe",
+        email: "admin@admin.com",
+        password: "12345678",
+      },
+    }),
+    prisma.user.create({
+      data: {
+        role: "USER",
+        name: "Jane Doe",
+        email: "user@user.com",
+        password: "12345678",
+      },
+    }),
+  ]);
 }
 
 seed().then(() => {

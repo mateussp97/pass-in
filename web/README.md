@@ -1,30 +1,97 @@
-# React + TypeScript + Vite
+[Back](../README.md)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# Pass.in Web Application
 
-Currently, two official plugins are available:
+Pass.in is an application for **managing participants in face-to-face events**.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## Expanding the ESLint configuration
+- User authentication and authorization
+- Event management dashboard
+- Registration for events
+- Ticket generation with QR code
+- Check-in functionality
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## Technologies
 
-- Configure the top-level `parserOptions` property like this:
+- **React** - JavaScript library for building user interfaces
+- **TypeScript** - Strongly typed programming language
+- **Vite** - Build tool for modern web development
+- **TailwindCSS** - Utility-first CSS framework
+- **Headless UI** - Library of pre-styled components
+- **Zod** - TypeScript-first schema validation
+- **React Hook Form** - Library for managing forms
+- **JWT authentication** - JSON Web Tokens for secure authentication
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
+## Pages
+
+- `/` - Login page
+- `/dashboard` - Dashboard (authenticated users only)
+- `/register/:eventId` - Event registration
+- `/ticket/:ticketId` - View ticket with QR code
+- `/get-ticket/:ticketHash` - Generate ticket from hash
+
+## Authentication
+
+The application uses JWT tokens for authentication. Tokens are stored in local storage and automatically included in API requests.
+
+### Login
+
+```http
+POST /login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "password123"
 }
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+### Protected Routes
+
+The application includes a `<ProtectedRoute>` component that redirects unauthenticated users to the login page.
+
+## Components
+
+- `<Modal>` - Reusable modal component
+- `<CreateEventModal>` - Modal for creating new events
+- `<AttendeeList>` - Display and manage event attendees
+- `<StyledInput>` - Styled form input
+- `<StyledTextarea>` - Styled form textarea
+- `<Header>` - Application header with navigation
+
+## State Management
+
+- Uses React hooks and context for state management
+- Modal state is managed via the `useModalStore` atom
+
+## Getting Started
+
+### Node Version
+
+Required Node version: v20.12.1
+
+### Installation
+
+```bash
+npm install
+```
+
+### Start Development Server
+
+```bash
+npm run dev
+```
+
+The application will be available at: http://localhost:5173
+
+### Build for Production
+
+```bash
+npm run build
+```
+
+## Access Credentials
+
+- Admin: `admin@admin.com` / `12345678`
+- User: `user@user.com` / `12345678`

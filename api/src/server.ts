@@ -8,12 +8,16 @@ import {
   validatorCompiler,
 } from "fastify-type-provider-zod";
 import { errorHandler } from "./error-handler";
+import { jwtAuth } from "./auth/jwt";
 import { checkIn } from "./routes/check-in";
 import { createEvent } from "./routes/create-event";
+import { createUser } from "./routes/create-user";
 import { getAttendeeBadge } from "./routes/get-attendee-badge";
 import { getEvent } from "./routes/get-event";
 import { getEventAttendees } from "./routes/get-event-attendees";
 import { getEvents } from "./routes/get-events";
+import { getUsers } from "./routes/get-users";
+import { login } from "./routes/login";
 import { registerForEvent } from "./routes/register-for-event";
 
 const app = fastify();
@@ -21,6 +25,8 @@ const app = fastify();
 app.register(fastifyCors, {
   origin: "*",
 });
+
+app.register(jwtAuth);
 
 app.register(fastifySwagger, {
   swagger: {
@@ -43,6 +49,7 @@ app.register(fastifySwaggerUI, {
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
 
+// Event routes
 app.register(createEvent);
 app.register(registerForEvent);
 app.register(getEvent);
@@ -50,6 +57,11 @@ app.register(getEvents);
 app.register(getEventAttendees);
 app.register(getAttendeeBadge);
 app.register(checkIn);
+
+// User and auth routes
+app.register(createUser);
+app.register(login);
+app.register(getUsers);
 
 app.setErrorHandler(errorHandler);
 

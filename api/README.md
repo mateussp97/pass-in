@@ -1,88 +1,144 @@
-# pass.in
+[Back](../README.md)
 
-O pass.in é uma aplicação de **gestão de participantes em eventos presenciais**.
+# Pass.in API
 
-A ferramenta permite que o organizador cadastre um evento e abra uma página pública de inscrição.
+Pass.in is an application for **managing participants in face-to-face events**.
 
-Os participantes inscritos podem emitir uma credencial para check-in no dia do evento.
+## Technologies
 
-O sistema fará um scan da credencial do participante para permitir a entrada no evento.
+- **TypeScript** - Strongly typed programming language
+- **Fastify** - Fast and low overhead web framework
+- **Prisma** - Next-generation ORM for Node.js and TypeScript
+- **JWT** - JSON Web Tokens for authentication
+- **Zod** - TypeScript-first schema validation
+- **SQLite** - Self-contained, serverless SQL database engine (for development)
 
-## Requisitos
+## Features
 
-### Requisitos funcionais
+- Event management (creation, viewing)
+- Participant registration and check-in
+- QR code-based attendance verification
+- Role-based authorization (ADMIN and VIEWER roles)
+- JWT-based authentication
+- Protected routes
 
-- [x] O organizador deve poder cadastrar um novo evento;
-- [x] O organizador deve poder visualizar dados de um evento;
-- [x] O organizador deve poser visualizar a lista de participantes;
-- [x] O participante deve poder se inscrever em um evento;
-- [x] O participante deve poder visualizar seu crachá de inscrição;
-- [x] O participante deve poder realizar check-in no evento;
+## Authentication System
 
-### Regras de negócio
+- JWT-based authentication
+- Password hashing with bcryptjs
+- Role-based authorization (ADMIN and VIEWER roles)
+- Protected routes
 
-- [x] O participante só pode se inscrever em um evento uma única vez;
-- [x] O participante só pode se inscrever em eventos com vagas disponíveis;
-- [x] O participante só pode realizar check-in em um evento uma única vez;
+### Authentication Routes
 
-### Requisitos não-funcionais
+- `POST /users` - Create a new user
+- `POST /login` - Authenticate and get JWT token
+- `GET /users` - Get all users (admin only)
 
-- [x] O check-in no evento será realizado através de um QRCode;
+### Creating a User
 
-### Novas Funcionalidades implementadas
+```http
+POST /users
+Content-Type: application/json
 
-- [x] Nova rota implementada que lista todos os eventos;
-
-## Documentação da API (Swagger)
-
-Para documentação da API, acesse o link: http://localhost:3333/docs
-
-## Banco de dados
-
-Nessa aplicação vamos utilizar banco de dados relacional (SQL). Para ambiente de desenvolvimento seguiremos com o SQLite pela facilidade do ambiente.
-
-### Diagrama ERD
-
-<img src=".github/erd.svg" width="600" alt="Diagrama ERD do banco de dados" />
-
-### Estrutura do banco (SQL)
-
-```sql
--- CreateTable
-CREATE TABLE "events" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "title" TEXT NOT NULL,
-    "details" TEXT,
-    "slug" TEXT NOT NULL,
-    "maximum_attendees" INTEGER
-);
-
--- CreateTable
-CREATE TABLE "attendees" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "name" TEXT NOT NULL,
-    "email" TEXT NOT NULL,
-    "event_id" TEXT NOT NULL,
-    "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "attendees_event_id_fkey" FOREIGN KEY ("event_id") REFERENCES "events" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
-);
-
--- CreateTable
-CREATE TABLE "check_ins" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "attendeeId" INTEGER NOT NULL,
-    CONSTRAINT "check_ins_attendeeId_fkey" FOREIGN KEY ("attendeeId") REFERENCES "attendees" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
-);
-
--- CreateIndex
-CREATE UNIQUE INDEX "events_slug_key" ON "events"("slug");
-
--- CreateIndex
-CREATE UNIQUE INDEX "attendees_event_id_email_key" ON "attendees"("event_id", "email");
-
--- CreateIndex
-CREATE UNIQUE INDEX "check_ins_attendeeId_key" ON "check_ins"("attendeeId");
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "password123",
+  "role": "ADMIN" // or "VIEWER" (default is "VIEWER")
+}
 ```
 
-`npx prisma db seed`
+### Authentication
+
+```http
+POST /login
+Content-Type: application/json
+
+{
+  "email": "john@example.com",
+  "password": "password123"
+}
+```
+
+Response:
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsIn..."
+}
+```
+
+### Accessing Protected Routes
+
+Add the JWT token to the Authorization header:
+
+```http
+GET /users
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsIn...
+```
+
+## API Routes
+
+- `POST /events` - Create a new event
+- `GET /events` - List all events
+- `GET /events/:eventId` - Get event details
+- `POST /events/:eventId/attendees` - Register for an event
+- `GET /events/:eventId/check-in` - Check-in to an event
+- `GET /events/:eventId/attendees` - Get list of attendees for an event
+
+## Business Rules
+
+- Participants can only register for an event once
+- Participants can only register for events with available spots
+- Participants can only check-in to an event once
+- Check-in is performed using a QR code
+
+## API Documentation
+
+API documentation is available via Swagger at: http://localhost:3333/docs
+
+## Database
+
+This application uses a relational database (SQL). For development, we use SQLite for ease of setup.
+
+### Environment Variables
+
+- `JWT_SECRET` - Secret key for JWT signing (set in .env file)
+- Other environment variables can be found in the `.env.example` file
+
+## Getting Started
+
+### Node Version
+
+Required Node version: v20.12.1
+
+### Installation
+
+```bash
+npm install
+```
+
+### Database Setup
+
+```bash
+npx prisma migrate dev
+npx prisma db seed
+```
+
+### Start Development Server
+
+```bash
+npm run dev
+```
+
+### Start Prisma Studio
+
+```bash
+npx prisma studio
+```
+
+## Access
+
+- Admin: `admin@admin.com` / `12345678`
+- User: `user@user.com` / `12345678`
