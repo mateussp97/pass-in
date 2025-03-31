@@ -2,10 +2,12 @@ import { faker } from "@faker-js/faker";
 import { Prisma } from "@prisma/client";
 import dayjs from "dayjs";
 import { prisma } from "../src/lib/prisma";
+import bcrypt from "bcryptjs";
 
 async function seed() {
   await prisma.event.deleteMany();
   await prisma.attendee.deleteMany();
+  await prisma.user.deleteMany();
 
   const eventsData = [
     {
@@ -78,7 +80,7 @@ async function seed() {
         role: "ADMIN",
         name: "John Doe",
         email: "admin@admin.com",
-        password: "12345678",
+        password: await bcrypt.hash("12345678", 10),
       },
     }),
     prisma.user.create({
@@ -86,7 +88,7 @@ async function seed() {
         role: "USER",
         name: "Jane Doe",
         email: "user@user.com",
-        password: "12345678",
+        password: await bcrypt.hash("12345678", 10),
       },
     }),
   ]);
